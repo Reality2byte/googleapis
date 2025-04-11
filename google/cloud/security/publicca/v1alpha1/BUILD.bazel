@@ -9,6 +9,11 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
+# buildifier: disable=load-on-top
+
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
+
 ##############################################################################
 # Common
 ##############################################################################
@@ -17,27 +22,23 @@ load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
-    name = "moblab_proto",
+    name = "publicca_proto",
     srcs = [
-        "build_service.proto",
         "resources.proto",
+        "service.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
-        "//google/api:routing_proto",
-        "//google/longrunning:operations_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:timestamp_proto",
     ],
 )
 
 proto_library_with_info(
-    name = "moblab_proto_with_info",
+    name = "publicca_proto_with_info",
     deps = [
-        ":moblab_proto",
+        ":publicca_proto",
         "//google/cloud:common_resources_proto",
     ],
 )
@@ -56,52 +57,53 @@ load(
 )
 
 java_proto_library(
-    name = "moblab_java_proto",
-    deps = [":moblab_proto"],
+    name = "publicca_java_proto",
+    deps = [":publicca_proto"],
 )
 
 java_grpc_library(
-    name = "moblab_java_grpc",
-    srcs = [":moblab_proto"],
-    deps = [":moblab_java_proto"],
+    name = "publicca_java_grpc",
+    srcs = [":publicca_proto"],
+    deps = [":publicca_java_proto"],
 )
 
 java_gapic_library(
-    name = "moblab_java_gapic",
-    srcs = [":moblab_proto_with_info"],
-    grpc_service_config = "moblab_grpc_service_config.json",
+    name = "publicca_java_gapic",
+    srcs = [":publicca_proto_with_info"],
+    gapic_yaml = None,
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     test_deps = [
-        ":moblab_java_grpc",
+        ":publicca_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
-        ":moblab_java_proto",
+        ":publicca_java_proto",
         "//google/api:api_java_proto",
     ],
 )
 
 java_gapic_test(
-    name = "moblab_java_gapic_test_suite",
+    name = "publicca_java_gapic_test_suite",
     test_classes = [
-        "com.google.chromeos.moblab.v1beta1.BuildServiceClientHttpJsonTest",
-        "com.google.chromeos.moblab.v1beta1.BuildServiceClientTest",
+        "com.google.cloud.security.publicca.v1alpha1.PublicCertificateAuthorityServiceClientHttpJsonTest",
+        "com.google.cloud.security.publicca.v1alpha1.PublicCertificateAuthorityServiceClientTest",
     ],
-    runtime_deps = [":moblab_java_gapic_test"],
+    runtime_deps = [":publicca_java_gapic_test"],
 )
 
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
-    name = "google-cloud-chromeos-moblab-v1beta1-java",
-    include_samples = True,
+    name = "google-cloud-security-publicca-v1alpha1-java",
     transport = "grpc+rest",
     deps = [
-        ":moblab_java_gapic",
-        ":moblab_java_grpc",
-        ":moblab_java_proto",
-        ":moblab_proto",
+        ":publicca_java_gapic",
+        ":publicca_java_grpc",
+        ":publicca_java_proto",
+        ":publicca_proto",
     ],
+    include_samples = True,
 )
 
 ##############################################################################
@@ -116,43 +118,39 @@ load(
 )
 
 go_proto_library(
-    name = "moblab_go_proto",
+    name = "publicca_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/chromeos/moblab/v1beta1",
-    protos = [":moblab_proto"],
+    importpath = "cloud.google.com/go/security/publicca/apiv1alpha1/publiccapb",
+    protos = [":publicca_proto"],
     deps = [
         "//google/api:annotations_go_proto",
-        "//google/longrunning:longrunning_go_proto",
     ],
 )
 
 go_gapic_library(
-    name = "moblab_go_gapic",
-    srcs = [":moblab_proto_with_info"],
-    grpc_service_config = "moblab_grpc_service_config.json",
-    importpath = "google.golang.org/google/chromeos/moblab/v1beta1;moblab",
+    name = "publicca_go_gapic",
+    srcs = [":publicca_proto_with_info"],
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
+    importpath = "cloud.google.com/go/security/publicca/apiv1alpha1;publicca",
     metadata = True,
     release_level = "beta",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":moblab_go_proto",
-        "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go_longrunning//:go_default_library",
-        "@com_google_cloud_go_longrunning//autogen:go_default_library",
+        ":publicca_go_proto",
     ],
 )
 
 # Open Source Packages
 go_gapic_assembly_pkg(
-    name = "gapi-cloud-chromeos-moblab-v1beta1-go",
+    name = "gapi-cloud-security-publicca-v1alpha1-go",
     deps = [
-        ":moblab_go_gapic",
-        ":moblab_go_gapic_srcjar-metadata.srcjar",
-        ":moblab_go_gapic_srcjar-snippets.srcjar",
-        ":moblab_go_gapic_srcjar-test.srcjar",
-        ":moblab_go_proto",
+        ":publicca_go_gapic",
+        ":publicca_go_gapic_srcjar-test.srcjar",
+        ":publicca_go_gapic_srcjar-metadata.srcjar",
+        ":publicca_go_gapic_srcjar-snippets.srcjar",
+        ":publicca_go_proto",
     ],
 )
 
@@ -168,31 +166,31 @@ load(
 )
 
 py_gapic_library(
-    name = "moblab_py_gapic",
-    srcs = [":moblab_proto"],
-    grpc_service_config = "moblab_grpc_service_config.json",
+    name = "publicca_py_gapic",
+    srcs = [":publicca_proto"],
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
     ],
 )
 
 py_test(
-    name = "moblab_py_gapic_test",
+    name = "publicca_py_gapic_test",
     srcs = [
-        "moblab_py_gapic_pytest.py",
-        "moblab_py_gapic_test.py",
+        "publicca_py_gapic_pytest.py",
+        "publicca_py_gapic_test.py",
     ],
     legacy_create_init = False,
-    deps = [":moblab_py_gapic"],
+    deps = [":publicca_py_gapic"],
 )
 
 # Open Source Packages
 py_gapic_assembly_pkg(
-    name = "chromeos-moblab-v1beta1-py",
+    name = "security-publicca-v1alpha1-py",
     deps = [
-        ":moblab_py_gapic",
+        ":publicca_py_gapic",
     ],
 )
 
@@ -208,29 +206,29 @@ load(
 )
 
 php_proto_library(
-    name = "moblab_php_proto",
-    deps = [":moblab_proto"],
+    name = "publicca_php_proto",
+    deps = [":publicca_proto"],
 )
 
 php_gapic_library(
-    name = "moblab_php_gapic",
-    srcs = [":moblab_proto_with_info"],
-    grpc_service_config = "moblab_grpc_service_config.json",
-    migration_mode = "PRE_MIGRATION_SURFACE_ONLY",
+    name = "publicca_php_gapic",
+    srcs = [":publicca_proto_with_info"],
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    migration_mode = "NEW_SURFACE_ONLY",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":moblab_php_proto",
+        ":publicca_php_proto",
     ],
 )
 
 # Open Source Packages
 php_gapic_assembly_pkg(
-    name = "google-cloud-chromeos-moblab-v1beta1-php",
+    name = "google-cloud-security-publicca-v1alpha1-php",
     deps = [
-        ":moblab_php_gapic",
-        ":moblab_php_proto",
+        ":publicca_php_gapic",
+        ":publicca_php_proto",
     ],
 )
 
@@ -245,23 +243,23 @@ load(
 )
 
 nodejs_gapic_library(
-    name = "moblab_nodejs_gapic",
-    package_name = "@google-cloud/moblab",
-    src = ":moblab_proto_with_info",
+    name = "publicca_nodejs_gapic",
+    package_name = "@google-cloud/publicca",
+    src = ":publicca_proto_with_info",
     extra_protoc_parameters = ["metadata"],
-    grpc_service_config = "moblab_grpc_service_config.json",
-    package = "google.chromeos.moblab.v1beta1",
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
+    package = "google.cloud.security.publicca.v1alpha1",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [],
 )
 
 nodejs_gapic_assembly_pkg(
-    name = "chromeos-moblab-v1beta1-nodejs",
+    name = "security-publicca-v1alpha1-nodejs",
     deps = [
-        ":moblab_nodejs_gapic",
-        ":moblab_proto",
+        ":publicca_nodejs_gapic",
+        ":publicca_proto",
     ],
 )
 
@@ -271,44 +269,46 @@ nodejs_gapic_assembly_pkg(
 # buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
 
 ruby_proto_library(
-    name = "moblab_ruby_proto",
-    deps = [":moblab_proto"],
+    name = "publicca_ruby_proto",
+    deps = [":publicca_proto"],
 )
 
 ruby_grpc_library(
-    name = "moblab_ruby_grpc",
-    srcs = [":moblab_proto"],
-    deps = [":moblab_ruby_proto"],
+    name = "publicca_ruby_grpc",
+    srcs = [":publicca_proto"],
+    deps = [":publicca_ruby_proto"],
 )
 
 ruby_cloud_gapic_library(
-    name = "moblab_ruby_gapic",
-    srcs = [":moblab_proto_with_info"],
-    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-chromeos-moblab-v1beta1"],
-    grpc_service_config = "moblab_grpc_service_config.json",
+    name = "publicca_ruby_gapic",
+    srcs = [":publicca_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-security-publicca-v1alpha1",
+    ],
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":moblab_ruby_grpc",
-        ":moblab_ruby_proto",
+        ":publicca_ruby_grpc",
+        ":publicca_ruby_proto",
     ],
 )
 
 # Open Source Packages
 ruby_gapic_assembly_pkg(
-    name = "google-cloud-chromeos-moblab-v1beta1-ruby",
+    name = "google-cloud-security-publicca-v1alpha1-ruby",
     deps = [
-        ":moblab_ruby_gapic",
-        ":moblab_ruby_grpc",
-        ":moblab_ruby_proto",
+        ":publicca_ruby_gapic",
+        ":publicca_ruby_grpc",
+        ":publicca_ruby_proto",
     ],
 )
 
@@ -325,38 +325,38 @@ load(
 )
 
 csharp_proto_library(
-    name = "moblab_csharp_proto",
+    name = "publicca_csharp_proto",
     extra_opts = [],
-    deps = [":moblab_proto"],
+    deps = [":publicca_proto"],
 )
 
 csharp_grpc_library(
-    name = "moblab_csharp_grpc",
-    srcs = [":moblab_proto"],
-    deps = [":moblab_csharp_proto"],
+    name = "publicca_csharp_grpc",
+    srcs = [":publicca_proto"],
+    deps = [":publicca_csharp_proto"],
 )
 
 csharp_gapic_library(
-    name = "moblab_csharp_gapic",
-    srcs = [":moblab_proto_with_info"],
+    name = "publicca_csharp_gapic",
+    srcs = [":publicca_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
-    grpc_service_config = "moblab_grpc_service_config.json",
+    grpc_service_config = "publicca_v1alpha1_grpc_service_config.json",
     rest_numeric_enums = True,
-    service_yaml = "chromeosmoblab_v1beta1.yaml",
+    service_yaml = "publicca_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":moblab_csharp_grpc",
-        ":moblab_csharp_proto",
+        ":publicca_csharp_grpc",
+        ":publicca_csharp_proto",
     ],
 )
 
 # Open Source Packages
 csharp_gapic_assembly_pkg(
-    name = "google-cloud-chromeos-moblab-v1beta1-csharp",
+    name = "google-cloud-security-publicca-v1alpha1-csharp",
     deps = [
-        ":moblab_csharp_gapic",
-        ":moblab_csharp_grpc",
-        ":moblab_csharp_proto",
+        ":publicca_csharp_gapic",
+        ":publicca_csharp_grpc",
+        ":publicca_csharp_proto",
     ],
 )
 
@@ -371,13 +371,13 @@ load(
 )
 
 cc_proto_library(
-    name = "moblab_cc_proto",
-    deps = [":moblab_proto"],
+    name = "publicca_cc_proto",
+    deps = [":publicca_proto"],
 )
 
 cc_grpc_library(
-    name = "moblab_cc_grpc",
-    srcs = [":moblab_proto"],
+    name = "publicca_cc_grpc",
+    srcs = [":publicca_proto"],
     grpc_only = True,
-    deps = [":moblab_cc_proto"],
+    deps = [":publicca_cc_proto"],
 )
